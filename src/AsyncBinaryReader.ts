@@ -71,14 +71,8 @@ function readNumber<Reader extends AsyncBinaryReader> (reader: Reader, method: k
       resolve(bufferMethods[method](buf, 0))
     }
   })
-  const _reader: any = reader
-  _reader._readPromise = Promise.resolve(_reader._readPromise)
-    .then(() => promise)
-    .then((value) => {
-      _reader._readPromise = null
-      return value
-    })
-  return _reader._readPromise
+
+  return promise
 }
 
 /**
@@ -89,7 +83,6 @@ export class AsyncBinaryReader extends Reader {
   private _buffer: Uint8Array | null
   private _file: number | File | null
   public readonly type!: 0 | 1
-  private _readPromise: Promise<any> | null
   private _opened: boolean
 
   public constructor (fileOrBuffer: string | File | Uint8Array) {
@@ -112,7 +105,6 @@ export class AsyncBinaryReader extends Reader {
       this._path = (fileOrBuffer as any).webkitRelativePath as string || ''
       this._buffer = null
     }
-    this._readPromise = null
     this._opened = true
   }
 
@@ -126,7 +118,6 @@ export class AsyncBinaryReader extends Reader {
       } else {
         this._buffer = null
       }
-      this._readPromise = null
       this._opened = false
     }
   }
@@ -148,13 +139,8 @@ export class AsyncBinaryReader extends Reader {
         resolve(buf)
       }
     })
-    this._readPromise = Promise.resolve(this._readPromise)
-      .then(() => promise)
-      .then((value) => {
-        this._readPromise = null
-        return value
-      })
-    return this._readPromise
+
+    return promise
   }
 
   public readToBuffer (buf: Uint8Array, bufStart: number = 0, len: number = 1): Promise<number> {
@@ -173,16 +159,10 @@ export class AsyncBinaryReader extends Reader {
         resolve(readLength)
       }
     })
-    this._readPromise = Promise.resolve(this._readPromise)
-      .then(() => promise)
-      .then((value) => {
-        this._readPromise = null
-        return value
-      })
-    return this._readPromise
+    return promise
   }
 
-  private async _readString (encoding: 'ascii' | 'utf8' = 'ascii', length: number = -1): Promise<string> {
+  public async readString (encoding: 'ascii' | 'utf8' = 'ascii', length: number = -1): Promise<string> {
     if (length === -1) {
       let l = 0
       const buf = new Uint8Array(1)
@@ -208,24 +188,8 @@ export class AsyncBinaryReader extends Reader {
     return bufferMethods.bufferToString(await this.read(length), encoding)
   }
 
-  public readString (encoding: 'ascii' | 'utf8' = 'ascii', length: number = -1): Promise<string> {
-    this._readPromise = Promise.resolve(this._readPromise)
-      .then(() => this._readString(encoding, length))
-      .then((value) => {
-        this._readPromise = null
-        return value
-      })
-    return this._readPromise
-  }
-
   public readBoolean (): Promise<boolean> {
-    this._readPromise = Promise.resolve(this._readPromise)
-      .then(() => this.readUInt8().then(u8 => (u8 !== 0)))
-      .then((value) => {
-        this._readPromise = null
-        return value
-      })
-    return this._readPromise
+    return this.readUInt8().then(u8 => (u8 !== 0))
   }
 
   public readInt8 (): Promise<number> {

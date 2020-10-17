@@ -1,6 +1,6 @@
 {
   "name": "@tybys/binreader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Binary reader for Node.js and browser.",
   "typings": "./lib/cjs-modern/index.d.ts",
   "module": "./lib/esm/index.js",
