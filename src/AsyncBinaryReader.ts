@@ -19,13 +19,18 @@ const listenerOpts = onceSupported ? { once: true } : false
 function fsRead (file: number | File, buf: Uint8Array, bufStart: number, len: number, pos: number): Promise<number> {
   return new Promise<number>((resolve, reject) => {
     if (typeof file === 'number') {
-      fs.read(file, buf, bufStart, len, pos, (err, bytesRead) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(bytesRead)
-        }
-      })
+      try {
+        resolve(fs.readSync(file, buf, bufStart, len, pos))
+      } catch (err) {
+        reject(err)
+      }
+      // fs.read(file, buf, bufStart, len, pos, (err, bytesRead) => {
+      //   if (err) {
+      //     reject(err)
+      //   } else {
+      //     resolve(bytesRead)
+      //   }
+      // })
     } else {
       const fr = new FileReader()
       fr.addEventListener('error', () => { reject(fr.error) }, listenerOpts)
