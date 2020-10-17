@@ -16,29 +16,40 @@ try {
 
 const listenerOpts = onceSupported ? { once: true } : false
 
-function fsRead (file: number | File, buf: Uint8Array, bufStart: number, len: number, pos: number): Promise<number> {
+function fsRead (reader: AsyncBinaryReader, buf: Uint8Array, bufStart: number, len: number, pos: number): Promise<number> {
   return new Promise<number>((resolve, reject) => {
+    const file: number | File = (reader as any)._file
     if (typeof file === 'number') {
       try {
         resolve(fs.readSync(file, buf, bufStart, len, pos))
       } catch (err) {
         reject(err)
       }
-      // fs.read(file, buf, bufStart, len, pos, (err, bytesRead) => {
-      //   if (err) {
-      //     reject(err)
-      //   } else {
-      //     resolve(bytesRead)
-      //   }
-      // })
     } else {
-      const fr = new FileReader()
-      fr.addEventListener('error', () => { reject(fr.error) }, listenerOpts)
-      fr.addEventListener('load', () => {
+      const fr: FileReader = (reader as any)._fr
+      let onError: () => void
+      // eslint-disable-next-line prefer-const
+      let onLoad: () => void
+      // eslint-disable-next-line prefer-const
+      onError = () => {
+        if (!onceSupported) {
+          fr.removeEventListener('error', onError)
+          fr.removeEventListener('load', onLoad)
+        }
+        reject(fr.error)
+      }
+      // eslint-disable-next-line prefer-const
+      onLoad = (): void => {
+        if (!onceSupported) {
+          fr.removeEventListener('error', onError)
+          fr.removeEventListener('load', onLoad)
+        }
         const readBuffer = new Uint8Array(fr.result as ArrayBuffer)
         const copied = bufferMethods.copy(readBuffer, buf, bufStart, 0, readBuffer.length)
         resolve(copied)
-      }, listenerOpts)
+      }
+      fr.addEventListener('error', onError, listenerOpts)
+      fr.addEventListener('load', onLoad, listenerOpts)
       fr.readAsArrayBuffer(file.slice(pos, pos + len))
     }
   })
@@ -66,7 +77,7 @@ function readNumber<Reader extends AsyncBinaryReader> (reader: Reader, method: k
     const buf = new Uint8Array(methods[method])
 
     if ((reader as any).type === BinaryType.FILE) {
-      fsRead((reader as any)._file, buf, 0, methods[method], reader.pos).then(readLength => {
+      fsRead(reader, buf, 0, methods[method], reader.pos).then(readLength => {
         reader.pos += readLength
         resolve(bufferMethods[method](buf, 0))
       }).catch(reject)
@@ -90,6 +101,9 @@ export class AsyncBinaryReader extends Reader {
   public readonly type!: 0 | 1
   private _opened: boolean
 
+  // @ts-expect-error
+  private _fr: FileReader | null
+
   public constructor (fileOrBuffer: string | File | Uint8Array) {
     if (fileOrBuffer instanceof Uint8Array) {
       super(fileOrBuffer.length)
@@ -97,18 +111,21 @@ export class AsyncBinaryReader extends Reader {
       this._path = ''
       this._file = null
       this._buffer = fileOrBuffer
+      this._fr = null
     } else if (typeof fileOrBuffer === 'string') {
       super(fs.statSync(fileOrBuffer).size)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
       this._file = fs.openSync(fileOrBuffer, 'r')
       this._path = fileOrBuffer
       this._buffer = null
+      this._fr = null
     } else {
       super(fileOrBuffer.size)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
       this._file = fileOrBuffer
       this._path = (fileOrBuffer as any).webkitRelativePath as string || ''
       this._buffer = null
+      this._fr = new FileReader()
     }
     this._opened = true
   }
@@ -118,6 +135,8 @@ export class AsyncBinaryReader extends Reader {
       if (this.type === BinaryType.FILE) {
         if (typeof this._file === 'number') {
           fs.closeSync(this._file)
+        } else {
+          this._fr = null
         }
         this._file = null
       } else {
@@ -134,7 +153,7 @@ export class AsyncBinaryReader extends Reader {
       }
       const buf = new Uint8Array(len)
       if (this.type === BinaryType.FILE) {
-        fsRead(this._file!, buf, 0, len, this.pos).then(readLength => {
+        fsRead(this, buf, 0, len, this.pos).then(readLength => {
           this.pos += readLength
           resolve(buf)
         }).catch(reject)
@@ -154,7 +173,7 @@ export class AsyncBinaryReader extends Reader {
         len = this._size - this.pos
       }
       if (this.type === BinaryType.FILE) {
-        fsRead(this._file!, buf, bufStart, len, this.pos).then(readLength => {
+        fsRead(this, buf, bufStart, len, this.pos).then(readLength => {
           this.pos += readLength
           resolve(readLength)
         }).catch(reject)
@@ -174,7 +193,7 @@ export class AsyncBinaryReader extends Reader {
       do {
         let readLength: number
         if (this.type === BinaryType.FILE) {
-          readLength = await fsRead(this._file!, buf, 0, 1, this.pos + l)
+          readLength = await fsRead(this, buf, 0, 1, this.pos + l)
         } else {
           readLength = bufferMethods.copy(this._buffer!, buf, 0, this.pos + l, this.pos + l + 1)
         }
@@ -183,7 +202,7 @@ export class AsyncBinaryReader extends Reader {
       } while (buf[0] !== 0)
       const r = new Uint8Array(l - 1)
       if (this.type === BinaryType.FILE) {
-        await fsRead(this._file!, r, 0, l - 1, this.pos)
+        await fsRead(this, r, 0, l - 1, this.pos)
       } else {
         bufferMethods.copy(this._buffer!, r, 0, this.pos, this.pos + l - 1)
       }
