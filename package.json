@@ -1,6 +1,6 @@
 {
   "name": "@tybys/binreader",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Binary reader for Node.js and browser.",
   "typings": "./lib/cjs-modern/index.d.ts",
   "module": "./lib/esm/index.js",
@@ -32,7 +32,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@tybys/tsgo": "^0.3.3",
+    "@tybys/tsgo": "^0.4.1",
     "@types/node": "^12.12.36",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
@@ -46,7 +46,7 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@tybys/native-require": "^2.0.2",
+    "@tybys/native-require": "^3.0.0",
     "tslib": "2.0.1"
   }
 }
