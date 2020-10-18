@@ -26,7 +26,7 @@ function fsRead (reader: AsyncBinaryReader, buf: Uint8Array, bufStart: number, l
         reject(err)
       }
     } else {
-      const fr: FileReader = (reader as any)._fr
+      const fr = new FileReader()
       let onError: () => void
       // eslint-disable-next-line prefer-const
       let onLoad: () => void
@@ -101,9 +101,6 @@ export class AsyncBinaryReader extends Reader {
   public readonly type!: 0 | 1
   private _opened: boolean
 
-  // @ts-expect-error
-  private _fr: FileReader | null
-
   public constructor (fileOrBuffer: string | File | Uint8Array) {
     if (fileOrBuffer instanceof Uint8Array) {
       super(fileOrBuffer.length)
@@ -111,21 +108,18 @@ export class AsyncBinaryReader extends Reader {
       this._path = ''
       this._file = null
       this._buffer = fileOrBuffer
-      this._fr = null
     } else if (typeof fileOrBuffer === 'string') {
       super(fs.statSync(fileOrBuffer).size)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
       this._file = fs.openSync(fileOrBuffer, 'r')
       this._path = fileOrBuffer
       this._buffer = null
-      this._fr = null
     } else {
       super(fileOrBuffer.size)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
       this._file = fileOrBuffer
       this._path = (fileOrBuffer as any).webkitRelativePath as string || ''
       this._buffer = null
-      this._fr = new FileReader()
     }
     this._opened = true
   }
@@ -135,8 +129,6 @@ export class AsyncBinaryReader extends Reader {
       if (this.type === BinaryType.FILE) {
         if (typeof this._file === 'number') {
           fs.closeSync(this._file)
-        } else {
-          this._fr = null
         }
         this._file = null
       } else {
