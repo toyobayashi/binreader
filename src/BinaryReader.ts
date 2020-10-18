@@ -70,6 +70,9 @@ export class BinaryReader extends Reader {
   }
 
   public read (len: number = 1): Uint8Array {
+    if (len === 0) {
+      return new Uint8Array(0)
+    }
     if (this.pos + len > this._size) {
       len = this._size - this.pos
     }
@@ -85,6 +88,9 @@ export class BinaryReader extends Reader {
   }
 
   public readToBuffer (buf: Uint8Array, bufStart: number = 0, len: number = 1): number {
+    if (len === 0) {
+      return 0
+    }
     if (this.pos + len > this._size) {
       len = this._size - this.pos
     }
@@ -99,6 +105,9 @@ export class BinaryReader extends Reader {
   }
 
   public readString (encoding: 'ascii' | 'utf8' = 'ascii', length: number = -1): string {
+    if (length === 0) {
+      return ''
+    }
     if (length === -1) {
       let l = 0
       const buf = new Uint8Array(1)

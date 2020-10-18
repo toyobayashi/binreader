@@ -140,6 +140,10 @@ export class AsyncBinaryReader extends Reader {
 
   public read (len: number = 1): Promise<Uint8Array> {
     const promise = new Promise<Uint8Array>((resolve, reject) => {
+      if (len === 0) {
+        resolve(new Uint8Array(0))
+        return
+      }
       if (this.pos + len > this._size) {
         len = this._size - this.pos
       }
@@ -161,6 +165,10 @@ export class AsyncBinaryReader extends Reader {
 
   public readToBuffer (buf: Uint8Array, bufStart: number = 0, len: number = 1): Promise<number> {
     const promise = new Promise<number>((resolve, reject) => {
+      if (len === 0) {
+        resolve(0)
+        return
+      }
       if (this.pos + len > this._size) {
         len = this._size - this.pos
       }
@@ -179,6 +187,9 @@ export class AsyncBinaryReader extends Reader {
   }
 
   public async readString (encoding: 'ascii' | 'utf8' = 'ascii', length: number = -1): Promise<string> {
+    if (length === 0) {
+      return ''
+    }
     if (length === -1) {
       let l = 0
       const buf = new Uint8Array(1)
