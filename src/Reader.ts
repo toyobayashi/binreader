@@ -52,6 +52,10 @@ export abstract class Reader {
     })
   }
 
+  public get size (): number {
+    return this._size
+  }
+
   /**
    * Set current position.
    * @param pos - Target position
