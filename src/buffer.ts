@@ -336,7 +336,7 @@ function toInteger (n: number, defaultVal: number): number {
   return defaultVal
 }
 
-export function bufferToString (buf: Uint8Array, encoding?: string, start?: number, end?: number): string {
+export function bufferToString (buf: Uint8Array, encoding?: 'ascii' | 'utf8', start?: number, end?: number): string {
   if (_Buffer !== null) {
     return _Buffer.from(buf).toString(encoding, start, end)
   }

@@ -9,7 +9,7 @@ Constructs a new instance of the `BinaryReader` class
 <b>Signature:</b>
 
 ```typescript
-constructor(buffer: string | Uint8Array);
+constructor(buffer: string | Uint8Array, endian?: EndianType);
 ```
 
 ## Parameters
@@ -17,4 +17,5 @@ constructor(buffer: string | Uint8Array);
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  buffer | string \| Uint8Array |  |
+|  endian | [EndianType](./binreader.endiantype.md) |  |
 

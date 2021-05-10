@@ -14,3 +14,9 @@ Binary reader for Node.js and browser.
 |  [BinaryReader](./binreader.binaryreader.md) |  |
 |  [Reader](./binreader.reader.md) |  |
 
+## Enumerations
+
+|  Enumeration | Description |
+|  --- | --- |
+|  [EndianType](./binreader.endiantype.md) |  |
+

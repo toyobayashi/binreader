@@ -1,6 +1,7 @@
 import * as bufferMethods from './buffer'
 import { Reader } from './Reader'
 import { fs } from './node'
+import { EndianType } from './EndianType'
 
 const methods = bufferMethods.methods
 
@@ -37,7 +38,9 @@ export class BinaryReader extends Reader {
   private _buffer: Uint8Array | null
   private _opened: boolean
 
-  public constructor (buffer: string | Uint8Array) {
+  public endian!: EndianType
+
+  public constructor (buffer: string | Uint8Array, endian: EndianType = EndianType.BigEndian) {
     if (typeof buffer === 'string') {
       super(fs.statSync(buffer).size)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
@@ -52,6 +55,17 @@ export class BinaryReader extends Reader {
     } else {
       throw new TypeError('[BinaryReader] Contructor parameter type error')
     }
+    Object.defineProperty(this, 'endian', {
+      configurable: true,
+      enumerable: true,
+      get () { return endian },
+      set (ed: EndianType) {
+        if (ed !== EndianType.BigEndian && ed !== EndianType.LittleEndian) {
+          throw new TypeError('endian type error')
+        }
+        endian = ed
+      }
+    })
     this._opened = true
   }
 
@@ -207,5 +221,37 @@ export class BinaryReader extends Reader {
 
   public readDoubleBE (): number {
     return readNumber(this, 'readDoubleBE')
+  }
+
+  public readInt16 (): number {
+    return this.endian === EndianType.BigEndian ? this.readInt16BE() : this.readInt16LE()
+  }
+
+  public readUInt16 (): number {
+    return this.endian === EndianType.BigEndian ? this.readUInt16BE() : this.readUInt16LE()
+  }
+
+  public readInt32 (): number {
+    return this.endian === EndianType.BigEndian ? this.readInt32BE() : this.readInt32LE()
+  }
+
+  public readUInt32 (): number {
+    return this.endian === EndianType.BigEndian ? this.readUInt32BE() : this.readUInt32LE()
+  }
+
+  public readBigInt64 (): bigint {
+    return this.endian === EndianType.BigEndian ? this.readBigInt64BE() : this.readBigInt64LE()
+  }
+
+  public readBigUInt64 (): bigint {
+    return this.endian === EndianType.BigEndian ? this.readBigUInt64BE() : this.readBigUInt64LE()
+  }
+
+  public readFloat (): number {
+    return this.endian === EndianType.BigEndian ? this.readFloatBE() : this.readFloatLE()
+  }
+
+  public readDouble (): number {
+    return this.endian === EndianType.BigEndian ? this.readDoubleBE() : this.readDoubleLE()
   }
 }

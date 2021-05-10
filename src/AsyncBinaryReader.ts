@@ -1,11 +1,12 @@
 import * as bufferMethods from './buffer'
 import { Reader } from './Reader'
 import { fs } from './node'
+import { EndianType } from './EndianType'
 
 let onceSupported = false
 
 try {
-  var options = Object.defineProperty({}, 'once', {
+  const options = Object.defineProperty({}, 'once', {
     get: function () {
       onceSupported = true
     }
@@ -101,7 +102,9 @@ export class AsyncBinaryReader extends Reader {
   public readonly type!: 0 | 1
   private _opened: boolean
 
-  public constructor (fileOrBuffer: string | File | Uint8Array) {
+  public endian!: EndianType
+
+  public constructor (fileOrBuffer: string | File | Uint8Array, endian: EndianType = EndianType.BigEndian) {
     if (fileOrBuffer instanceof Uint8Array) {
       super(fileOrBuffer.length)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.BUFFER })
@@ -121,6 +124,17 @@ export class AsyncBinaryReader extends Reader {
       this._path = (fileOrBuffer as any).webkitRelativePath as string || ''
       this._buffer = null
     }
+    Object.defineProperty(this, 'endian', {
+      configurable: true,
+      enumerable: true,
+      get () { return endian },
+      set (ed: EndianType) {
+        if (ed !== EndianType.BigEndian && ed !== EndianType.LittleEndian) {
+          throw new TypeError('endian type error')
+        }
+        endian = ed
+      }
+    })
     this._opened = true
   }
 
@@ -289,5 +303,37 @@ export class AsyncBinaryReader extends Reader {
 
   public readDoubleBE (): Promise<number> {
     return readNumber(this, 'readDoubleBE')
+  }
+
+  public readInt16 (): Promise<number> {
+    return this.endian === EndianType.BigEndian ? this.readInt16BE() : this.readInt16LE()
+  }
+
+  public readUInt16 (): Promise<number> {
+    return this.endian === EndianType.BigEndian ? this.readUInt16BE() : this.readUInt16LE()
+  }
+
+  public readInt32 (): Promise<number> {
+    return this.endian === EndianType.BigEndian ? this.readInt32BE() : this.readInt32LE()
+  }
+
+  public readUInt32 (): Promise<number> {
+    return this.endian === EndianType.BigEndian ? this.readUInt32BE() : this.readUInt32LE()
+  }
+
+  public readBigInt64 (): Promise<bigint> {
+    return this.endian === EndianType.BigEndian ? this.readBigInt64BE() : this.readBigInt64LE()
+  }
+
+  public readBigUInt64 (): Promise<bigint> {
+    return this.endian === EndianType.BigEndian ? this.readBigUInt64BE() : this.readBigUInt64LE()
+  }
+
+  public readFloat (): Promise<number> {
+    return this.endian === EndianType.BigEndian ? this.readFloatBE() : this.readFloatLE()
+  }
+
+  public readDouble (): Promise<number> {
+    return this.endian === EndianType.BigEndian ? this.readDoubleBE() : this.readDoubleLE()
   }
 }

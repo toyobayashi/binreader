@@ -16,13 +16,14 @@ export declare class AsyncBinaryReader extends Reader
 
 |  Constructor | Modifiers | Description |
 |  --- | --- | --- |
-|  [(constructor)(fileOrBuffer)](./binreader.asyncbinaryreader._constructor_.md) |  | Constructs a new instance of the <code>AsyncBinaryReader</code> class |
+|  [(constructor)(fileOrBuffer, endian)](./binreader.asyncbinaryreader._constructor_.md) |  | Constructs a new instance of the <code>AsyncBinaryReader</code> class |
 
 ## Properties
 
 |  Property | Modifiers | Type | Description |
 |  --- | --- | --- | --- |
 |  [\_path](./binreader.asyncbinaryreader._path.md) |  | string |  |
+|  [endian](./binreader.asyncbinaryreader.endian.md) |  | [EndianType](./binreader.endiantype.md) |  |
 |  [type](./binreader.asyncbinaryreader.type.md) |  | 0 \| 1 |  |
 
 ## Methods
@@ -31,24 +32,32 @@ export declare class AsyncBinaryReader extends Reader
 |  --- | --- | --- |
 |  [close()](./binreader.asyncbinaryreader.close.md) |  |  |
 |  [read(len)](./binreader.asyncbinaryreader.read.md) |  |  |
+|  [readBigInt64()](./binreader.asyncbinaryreader.readbigint64.md) |  |  |
 |  [readBigInt64BE()](./binreader.asyncbinaryreader.readbigint64be.md) |  |  |
 |  [readBigInt64LE()](./binreader.asyncbinaryreader.readbigint64le.md) |  |  |
+|  [readBigUInt64()](./binreader.asyncbinaryreader.readbiguint64.md) |  |  |
 |  [readBigUInt64BE()](./binreader.asyncbinaryreader.readbiguint64be.md) |  |  |
 |  [readBigUInt64LE()](./binreader.asyncbinaryreader.readbiguint64le.md) |  |  |
 |  [readBoolean()](./binreader.asyncbinaryreader.readboolean.md) |  |  |
+|  [readDouble()](./binreader.asyncbinaryreader.readdouble.md) |  |  |
 |  [readDoubleBE()](./binreader.asyncbinaryreader.readdoublebe.md) |  |  |
 |  [readDoubleLE()](./binreader.asyncbinaryreader.readdoublele.md) |  |  |
+|  [readFloat()](./binreader.asyncbinaryreader.readfloat.md) |  |  |
 |  [readFloatBE()](./binreader.asyncbinaryreader.readfloatbe.md) |  |  |
 |  [readFloatLE()](./binreader.asyncbinaryreader.readfloatle.md) |  |  |
+|  [readInt16()](./binreader.asyncbinaryreader.readint16.md) |  |  |
 |  [readInt16BE()](./binreader.asyncbinaryreader.readint16be.md) |  |  |
 |  [readInt16LE()](./binreader.asyncbinaryreader.readint16le.md) |  |  |
+|  [readInt32()](./binreader.asyncbinaryreader.readint32.md) |  |  |
 |  [readInt32BE()](./binreader.asyncbinaryreader.readint32be.md) |  |  |
 |  [readInt32LE()](./binreader.asyncbinaryreader.readint32le.md) |  |  |
 |  [readInt8()](./binreader.asyncbinaryreader.readint8.md) |  |  |
 |  [readString(encoding, length)](./binreader.asyncbinaryreader.readstring.md) |  |  |
 |  [readToBuffer(buf, bufStart, len)](./binreader.asyncbinaryreader.readtobuffer.md) |  |  |
+|  [readUInt16()](./binreader.asyncbinaryreader.readuint16.md) |  |  |
 |  [readUInt16BE()](./binreader.asyncbinaryreader.readuint16be.md) |  |  |
 |  [readUInt16LE()](./binreader.asyncbinaryreader.readuint16le.md) |  |  |
+|  [readUInt32()](./binreader.asyncbinaryreader.readuint32.md) |  |  |
 |  [readUInt32BE()](./binreader.asyncbinaryreader.readuint32be.md) |  |  |
 |  [readUInt32LE()](./binreader.asyncbinaryreader.readuint32le.md) |  |  |
 |  [readUInt8()](./binreader.asyncbinaryreader.readuint8.md) |  |  |
