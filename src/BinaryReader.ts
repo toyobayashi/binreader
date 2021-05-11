@@ -2,6 +2,7 @@ import * as bufferMethods from './buffer'
 import { Reader } from './Reader'
 import { fs } from './node'
 import { EndianType } from './EndianType'
+import { FileDescriptor } from './FileDescriptor'
 
 const methods = bufferMethods.methods
 
@@ -40,7 +41,7 @@ export class BinaryReader extends Reader {
 
   public endian!: EndianType
 
-  public constructor (buffer: string | Uint8Array, endian: EndianType = EndianType.BigEndian) {
+  public constructor (buffer: string | Uint8Array | FileDescriptor, endian: EndianType = EndianType.BigEndian) {
     if (typeof buffer === 'string') {
       super(fs.statSync(buffer).size)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
@@ -49,9 +50,16 @@ export class BinaryReader extends Reader {
       this._buffer = null
     } else if (buffer instanceof Uint8Array) {
       super(buffer.length)
+      Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.BUFFER })
       this._file = null
       this._path = ''
       this._buffer = buffer
+    } else if (buffer instanceof FileDescriptor) {
+      super(buffer.size)
+      Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
+      this._file = buffer.fd
+      this._path = buffer.path
+      this._buffer = null
     } else {
       throw new TypeError('[BinaryReader] Contructor parameter type error')
     }

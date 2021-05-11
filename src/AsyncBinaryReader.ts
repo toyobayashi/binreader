@@ -2,6 +2,7 @@ import * as bufferMethods from './buffer'
 import { Reader } from './Reader'
 import { fs } from './node'
 import { EndianType } from './EndianType'
+import { FileDescriptor } from './FileDescriptor'
 
 let onceSupported = false
 
@@ -104,7 +105,7 @@ export class AsyncBinaryReader extends Reader {
 
   public endian!: EndianType
 
-  public constructor (fileOrBuffer: string | File | Uint8Array, endian: EndianType = EndianType.BigEndian) {
+  public constructor (fileOrBuffer: string | File | Uint8Array | FileDescriptor, endian: EndianType = EndianType.BigEndian) {
     if (fileOrBuffer instanceof Uint8Array) {
       super(fileOrBuffer.length)
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.BUFFER })
@@ -116,6 +117,12 @@ export class AsyncBinaryReader extends Reader {
       Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
       this._file = fs.openSync(fileOrBuffer, 'r')
       this._path = fileOrBuffer
+      this._buffer = null
+    } else if (fileOrBuffer instanceof FileDescriptor) {
+      super(fileOrBuffer.size)
+      Object.defineProperty(this, 'type', { configurable: true, enumerable: true, writable: false, value: BinaryType.FILE })
+      this._file = fileOrBuffer.fd
+      this._path = fileOrBuffer.path
       this._buffer = null
     } else {
       super(fileOrBuffer.size)
