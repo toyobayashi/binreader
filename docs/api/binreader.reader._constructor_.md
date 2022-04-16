@@ -16,5 +16,5 @@ protected constructor(size?: number);
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  size | number |  |
+|  size | number | <i>(Optional)</i> |
 

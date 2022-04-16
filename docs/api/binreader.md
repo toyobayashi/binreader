@@ -12,6 +12,7 @@ Binary reader for Node.js and browser.
 |  --- | --- |
 |  [AsyncBinaryReader](./binreader.asyncbinaryreader.md) |  |
 |  [BinaryReader](./binreader.binaryreader.md) |  |
+|  [FileDescriptor](./binreader.filedescriptor.md) |  |
 |  [Reader](./binreader.reader.md) |  |
 
 ## Enumerations

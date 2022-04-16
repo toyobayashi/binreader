@@ -14,7 +14,7 @@ read(len?: number): Promise<Uint8Array>;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  len | number |  |
+|  len | number | <i>(Optional)</i> |
 
 <b>Returns:</b>
 

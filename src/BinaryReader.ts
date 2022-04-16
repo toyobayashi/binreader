@@ -1,5 +1,5 @@
 import * as bufferMethods from './buffer'
-import { Reader } from './Reader'
+import { Reader, checkRange } from './Reader'
 import { fs } from './node'
 import { EndianType } from './EndianType'
 import { FileDescriptor } from './FileDescriptor'
@@ -14,6 +14,7 @@ const enum BinaryType {
 function readNumber<Reader extends BinaryReader> (reader: Reader, method: bufferMethods.MethodsReturnBigInt): bigint
 function readNumber<Reader extends BinaryReader> (reader: Reader, method: Exclude<keyof typeof methods, bufferMethods.MethodsReturnBigInt>): number
 function readNumber<Reader extends BinaryReader> (reader: Reader, method: keyof typeof methods): boolean | number | bigint {
+  checkRange(reader.pos, reader.size)
   if (method === 'readBigInt64BE' || method === 'readBigInt64LE' || method === 'readBigUInt64BE' || method === 'readBigUInt64LE') {
     bufferMethods.validateBigInt()
   }
@@ -92,12 +93,12 @@ export class BinaryReader extends Reader {
   }
 
   public read (len: number = 1): Uint8Array {
-    if (len === 0) {
-      return new Uint8Array(0)
-    }
+    checkRange(this.pos, this._size)
+    if (len === 0) return new Uint8Array(0)
     if (this.pos + len > this._size) {
       len = this._size - this.pos
     }
+    if (len === 0) return new Uint8Array(0)
     const buf = new Uint8Array(len)
     let readLength: number
     if (this.type === BinaryType.FILE) {
@@ -110,12 +111,12 @@ export class BinaryReader extends Reader {
   }
 
   public readToBuffer (buf: Uint8Array, bufStart: number = 0, len: number = 1): number {
-    if (len === 0) {
-      return 0
-    }
+    checkRange(this.pos, this._size)
+    if (len === 0) return 0
     if (this.pos + len > this._size) {
       len = this._size - this.pos
     }
+    if (len === 0) return 0
     let readLength: number
     if (this.type === BinaryType.FILE) {
       readLength = fs.readSync(this._file!, buf, bufStart, len, this.pos)
@@ -127,9 +128,8 @@ export class BinaryReader extends Reader {
   }
 
   public readString (encoding: 'ascii' | 'utf8' = 'ascii', length: number = -1): string {
-    if (length === 0) {
-      return ''
-    }
+    checkRange(this.pos, this._size)
+    if (length === 0) return ''
     if (length === -1) {
       let l = 0
       const buf = new Uint8Array(1)

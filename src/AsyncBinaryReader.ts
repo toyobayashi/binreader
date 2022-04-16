@@ -1,5 +1,5 @@
 import * as bufferMethods from './buffer'
-import { Reader } from './Reader'
+import { Reader, checkRange } from './Reader'
 import { fs } from './node'
 import { EndianType } from './EndianType'
 import { FileDescriptor } from './FileDescriptor'
@@ -68,13 +68,9 @@ function readNumber<Reader extends AsyncBinaryReader> (reader: Reader, method: b
 function readNumber<Reader extends AsyncBinaryReader> (reader: Reader, method: Exclude<keyof typeof methods, bufferMethods.MethodsReturnBigInt>): Promise<number>
 function readNumber<Reader extends AsyncBinaryReader> (reader: Reader, method: keyof typeof methods): Promise<boolean | number | bigint> {
   const promise = new Promise<boolean | number | bigint>((resolve, reject) => {
+    checkRange(reader.pos, reader.size)
     if (method === 'readBigInt64BE' || method === 'readBigInt64LE' || method === 'readBigUInt64BE' || method === 'readBigUInt64LE') {
-      try {
-        bufferMethods.validateBigInt()
-      } catch (error) {
-        reject(error)
-        return
-      }
+      bufferMethods.validateBigInt()
     }
     const buf = new Uint8Array(methods[method])
 
@@ -161,12 +157,17 @@ export class AsyncBinaryReader extends Reader {
 
   public read (len: number = 1): Promise<Uint8Array> {
     const promise = new Promise<Uint8Array>((resolve, reject) => {
+      checkRange(this.pos, this._size)
       if (len === 0) {
         resolve(new Uint8Array(0))
         return
       }
       if (this.pos + len > this._size) {
         len = this._size - this.pos
+      }
+      if (len === 0) {
+        resolve(new Uint8Array(0))
+        return
       }
       const buf = new Uint8Array(len)
       if (this.type === BinaryType.FILE) {
@@ -186,12 +187,17 @@ export class AsyncBinaryReader extends Reader {
 
   public readToBuffer (buf: Uint8Array, bufStart: number = 0, len: number = 1): Promise<number> {
     const promise = new Promise<number>((resolve, reject) => {
+      checkRange(this.pos, this._size)
       if (len === 0) {
         resolve(0)
         return
       }
       if (this.pos + len > this._size) {
         len = this._size - this.pos
+      }
+      if (len === 0) {
+        resolve(0)
+        return
       }
       if (this.type === BinaryType.FILE) {
         fsRead(this, buf, bufStart, len, this.pos).then(readLength => {
@@ -208,6 +214,7 @@ export class AsyncBinaryReader extends Reader {
   }
 
   public async readString (encoding: 'ascii' | 'utf8' = 'ascii', length: number = -1): Promise<string> {
+    checkRange(this.pos, this._size)
     if (length === 0) {
       return ''
     }

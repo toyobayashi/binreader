@@ -23,6 +23,7 @@ export declare abstract class Reader
 |  --- | --- | --- | --- |
 |  [\_size](./binreader.reader._size.md) |  | number | Size of binary. |
 |  [pos](./binreader.reader.pos.md) |  | number | Current position. |
+|  [size](./binreader.reader.size.md) |  | number |  |
 |  [strictRangeChecking](./binreader.reader.strictrangechecking.md) |  | boolean | Throws RangeError if position is out of range when set this to <code>true</code> |
 
 ## Methods

@@ -1,3 +1,9 @@
+export function checkRange (pos: number, size: number): void {
+  if (pos < 0 || pos > size) {
+    throw new RangeError(`Position (${pos}) out of range: [0, ${size}]`)
+  }
+}
+
 /** @public */
 export abstract class Reader {
   /**
@@ -28,26 +34,31 @@ export abstract class Reader {
         if (typeof v !== 'number' || Number.isNaN(v)) {
           throw new TypeError('Invalid position')
         }
-        let message: string
-        if (v < 0) {
-          message = `Position out of range: ${v} < 0`
-          if (!this.strictRangeChecking) {
-            console.warn(`${message}, set position to 0`)
-            pos = 0
-            return
-          }
-          throw new RangeError(message)
-        }
-        if (v > this._size) {
-          message = `Position out of range: ${v} > ${this._size}`
-          if (!this.strictRangeChecking) {
-            console.warn(`${message}, set position to the end`)
-            pos = this._size
-            return
-          }
-          throw new RangeError(message)
+        if (this.strictRangeChecking) {
+          checkRange(v, this._size)
         }
         pos = v
+
+        // let message: string
+        // if (v < 0) {
+        //   message = `Position out of range: ${v} < 0`
+        //   if (!this.strictRangeChecking) {
+        //     console.warn(`${message}, set position to 0`)
+        //     pos = 0
+        //     return
+        //   }
+        //   throw new RangeError(message)
+        // }
+        // if (v > this._size) {
+        //   message = `Position out of range: ${v} > ${this._size}`
+        //   if (!this.strictRangeChecking) {
+        //     console.warn(`${message}, set position to the end`)
+        //     pos = this._size
+        //     return
+        //   }
+        //   throw new RangeError(message)
+        // }
+        // pos = v
       }
     })
   }

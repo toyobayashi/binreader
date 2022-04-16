@@ -14,8 +14,8 @@ readString(encoding?: 'ascii' | 'utf8', length?: number): Promise<string>;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  encoding | 'ascii' \| 'utf8' |  |
-|  length | number |  |
+|  encoding | 'ascii' \| 'utf8' | <i>(Optional)</i> |
+|  length | number | <i>(Optional)</i> |
 
 <b>Returns:</b>
 

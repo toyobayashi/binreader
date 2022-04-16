@@ -9,13 +9,13 @@ Constructs a new instance of the `BinaryReader` class
 <b>Signature:</b>
 
 ```typescript
-constructor(buffer: string | Uint8Array, endian?: EndianType);
+constructor(buffer: string | Uint8Array | FileDescriptor, endian?: EndianType);
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  buffer | string \| Uint8Array |  |
-|  endian | [EndianType](./binreader.endiantype.md) |  |
+|  buffer | string \| Uint8Array \| [FileDescriptor](./binreader.filedescriptor.md) |  |
+|  endian | [EndianType](./binreader.endiantype.md) | <i>(Optional)</i> |
 

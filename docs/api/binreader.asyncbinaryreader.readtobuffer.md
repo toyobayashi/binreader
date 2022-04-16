@@ -15,8 +15,8 @@ readToBuffer(buf: Uint8Array, bufStart?: number, len?: number): Promise<number>;
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  buf | Uint8Array |  |
-|  bufStart | number |  |
-|  len | number |  |
+|  bufStart | number | <i>(Optional)</i> |
+|  len | number | <i>(Optional)</i> |
 
 <b>Returns:</b>
 
